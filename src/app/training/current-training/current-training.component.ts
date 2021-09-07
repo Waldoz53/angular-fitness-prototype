@@ -1,5 +1,6 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { TrainingService } from '../training.service';
 
 import { StopTrainingComponent } from './stop-training.component';
 
@@ -9,12 +10,13 @@ import { StopTrainingComponent } from './stop-training.component';
   styleUrls: ['./current-training.component.css']
 })
 export class CurrentTrainingComponent implements OnInit {
-  @Output() trainingExit = new EventEmitter();
   progress = 0;
   timer!: number;
   message = "You can do it!"
 
-  constructor(private dialog: MatDialog) { }
+  constructor(private dialog: MatDialog, private trainingService: TrainingService) {
+
+  }
 
   ngOnInit(): void {
     this.startOrResumeTimer();
@@ -22,16 +24,18 @@ export class CurrentTrainingComponent implements OnInit {
   
   startOrResumeTimer() {
     //uses window.setInterval otherwise editors throw an error that doesn't mean anything? need to research this more.
+    const step = this.trainingService.getCurrentExercise().duration / 100 * 1000;
     this.timer = window.setInterval(() => {
-      this.progress += 2; //as close to making progress each second (1.666...) without making it annoying to read
+      this.progress += 1; //as close to making progress each second (1.666...) without making it annoying to read
       if (this.progress >= 75) {
         this.message = "You're almost there!"
       }
       if (this.progress >= 100) {
+        this.trainingService.completeExercise();
         clearInterval(this.timer);
         this.message = "You did it!"
       }
-    }, 1000);
+    }, step);
   }
 
   onStop() {
@@ -44,7 +48,7 @@ export class CurrentTrainingComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.trainingExit.emit();
+        this.trainingService.cancelExercise(this.progress)
       } else {
         this.startOrResumeTimer();
       }
