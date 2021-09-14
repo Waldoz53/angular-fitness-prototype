@@ -18,12 +18,16 @@ export class NewTrainingComponent implements OnInit, OnDestroy {
   constructor(private trainingService: TrainingService, private db: AngularFirestore) { }
 
   ngOnInit(): void {
-    this.exerciseSubscription = this.trainingService.exercisesChanged.subscribe(exercises => (this.exercises = exercises));
-    this.trainingService.fetchAvailableExercises();
+    this.fetchExercises();
   }
 
   ngOnDestroy() {
     this.exerciseSubscription.unsubscribe();
+  }
+
+  fetchExercises() {
+    this.exerciseSubscription = this.trainingService.exercisesChanged.subscribe(exercises => (this.exercises = exercises));
+    this.trainingService.fetchAvailableExercises();
   }
 
   onStartTraining(form: NgForm) {

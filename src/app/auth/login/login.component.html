@@ -23,6 +23,7 @@
         #pwInput="ngModel">
         <mat-hint align="end">{{ pwInput.value?.length }} / 6</mat-hint>
     </mat-form-field>
-    <button type='submit' mat-raised-button color="primary" [disabled]="f.invalid">Login</button>
+    <button *ngIf="!(uiService.loadingStateChanged | async)" type='submit' mat-raised-button color="primary" [disabled]="f.invalid">Login</button>
+    <mat-spinner *ngIf="uiService.loadingStateChanged | async"></mat-spinner>
   </form>
 </section>
